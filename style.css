@@ -1,0 +1,39 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root {
+  --color-primary: #0057D9;
+  --color-secondary: #00B2A9;
+  --color-accent: #FF8A00;
+  --color-dark: #0F172A;
+  --color-muted: #64748B;
+}
+* { box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: #0b1220; }
+.navbar-brand img { height: 28px; }
+.btn-primary { background: var(--color-primary); border-color: var(--color-primary); }
+.btn-outline-primary{ border-color: var(--color-primary); color: var(--color-primary); }
+.btn-outline-primary:hover{ background: var(--color-primary); color:#fff; }
+.hero { background: linear-gradient(180deg, rgba(0,87,217,0.08), rgba(0,0,0,0)); }
+.badge-brand { background: rgba(0,178,169,.12); color: var(--color-secondary); }
+.property-card img { object-fit: cover; height: 200px; }
+.sticky-filter { position: sticky; top: 80px; }
+.lang-switch .dropdown-menu { min-width: 6rem; }
+.shadow-soft { box-shadow: 0 10px 30px rgba(2,8,20,0.06), 0 2px 6px rgba(2,8,20,0.04); }
+@media (max-width: 768px) {
+  .property-card img { height: 160px; }
+}
+
+/* Pro features */
+.uploader { border: 2px dashed rgba(2,8,20,.15); padding: 16px; border-radius: 8px; text-align:center; cursor: pointer; }
+.uploader input[type=file]{ display:none; }
+.message { padding: .5rem .75rem; border-radius: .75rem; max-width: 75%; }
+.message.me { background: #e8f0ff; margin-left: auto; }
+.message.other { background: #f3f4f6; margin-right: auto; }
+.thread-list .thread { padding: .5rem .75rem; border-radius: .5rem; cursor: pointer; }
+.thread.active { background: #eef2ff; }
+.badge-status { font-size: .75rem; }
+
+.hl{background:#fff3b0;padding:0 .1em;border-radius:.15rem;}
+
+.tag-badge{display:inline-block;padding:.15rem .5rem;border-radius:.5rem;font-size:.75rem;margin-right:.25rem}
+.tag-green{background:#e6f7e9;color:#18794e}.tag-red{background:#fde8e8;color:#b42318}.tag-blue{background:#e7f0ff;color:#1346d8}.tag-gray{background:#f3f4f6;color:#374151}.tag-yellow{background:#fff7cc;color:#915930}

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "prg-ap-001",
+    "title": "Slunn\u00fd 2+kk v \u017di\u017ekov\u011b / Sunny 2BR in \u017di\u017ekov",
+    "type": "Apartment",
+    "deal": "Rent",
+    "price": 980,
+    "city": "Prague",
+    "address": "Jeseniova 25, Prague 3",
+    "beds": 2,
+    "area": 68,
+    "lat": 50.088,
+    "lng": 14.455,
+    "images": [
+      "https://images.unsplash.com/photo-1505691723518-36a5ac3b2a59?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507086182422-97bd7ca241df?w=1200&q=80&auto=format&fit=crop"
+    ],
+    "featured": true,
+    "description": "Sv\u011btl\u00fd byt s balkonem, bl\u00edzko tram a park\u016f. / Bright apartment with balcony."
+  },
+  {
+    "id": "brt-hs-002",
+    "title": "Rodinn\u00fd d\u016fm se zahradou / Family House with Garden",
+    "type": "House",
+    "deal": "Sale",
+    "price": 325000,
+    "city": "Bratislava",
+    "address": "Ru\u017einov",
+    "beds": 4,
+    "area": 145,
+    "lat": 48.153,
+    "lng": 17.182,
+    "images": [
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1560185008-b033106af2a4?w=1200&q=80&auto=format&fit=crop"
+    ],
+    "featured": true,
+    "description": "Zrekonstruovan\u00fd d\u016fm v klidn\u00e9 ulici. / Renovated house in quiet street."
+  },
+  {
+    "id": "vie-rm-003",
+    "title": "Pokoj u TU Wien / Room near TU Wien",
+    "type": "Room",
+    "deal": "Rent",
+    "price": 520,
+    "city": "Vienna",
+    "address": "Wieden",
+    "beds": 1,
+    "area": 16,
+    "lat": 48.196,
+    "lng": 16.369,
+    "images": [
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1200&q=80&auto=format&fit=crop"
+    ],
+    "featured": false,
+    "description": "\u00datuln\u00fd pokoj ve spolubydlen\u00ed. / Cozy furnished room."
+  },
+  {
+    "id": "bud-ln-004",
+    "title": "Stavebn\u00ed pozemek 800 m\u00b2 / Building Plot 800 m\u00b2",
+    "type": "Land",
+    "deal": "Sale",
+    "price": 79000,
+    "city": "Budapest",
+    "address": "District XXII",
+    "beds": 0,
+    "area": 800,
+    "lat": 47.426,
+    "lng": 19.07,
+    "images": [
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop"
+    ],
+    "featured": false,
+    "description": "Pozemek p\u0159ipraven\u00fd k v\u00fdstavb\u011b. / Ready-to-build plot."
+  }
+]

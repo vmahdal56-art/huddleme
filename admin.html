@@ -1,0 +1,469 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin · bezrealit.eu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="/assets/img/logo.svg" alt="" class="me-2" height="28"><strong>bezrealit.eu</strong>
+    </a>
+  </div>
+</nav>
+<main class="container py-4" id="admin">
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#mod" type="button" role="tab">Moderation queue</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">Roles</button></li>
+  </ul>
+  <ul class="nav nav-tabs mt-3" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Users</button></li>
+  
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">Logs</button></li>
+  </ul>
+  <div class="tab-content border-start border-end border-bottom p-3">
+    <div class="tab-pane fade show active" id="mod" role="tabpanel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 m-0">Čekající inzeráty</h2>
+      </div>
+      <div class="d-flex gap-2 mb-2">
+  <button class="btn btn-sm btn-outline-primary" id="approveSelected">Schválit vybrané</button>
+  <button class="btn btn-sm btn-outline-danger" id="rejectSelected">Zamítnout vybrané</button>
+</div>
+<div class="row">
+  <div class="col-lg-8">
+    <div id="queue" class="row g-3"></div>
+  </div>
+  <aside class="col-lg-4">
+    <div class="card" id="detailPanel">
+      <div class="card-header">Detail</div>
+      <div class="card-body">
+        <div id="detailContent" class="text-muted">Vyberte inzerát…</div>
+        <div class="mt-3">
+          <textarea class="form-control" rows="3" id="modNote" placeholder="Poznámka pro moderation log"></textarea>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+    </div>
+    <div class="tab-pane fade" id="roles" role="tabpanel">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Nastavení rolí uživatele</div>
+            <div class="card-body">
+              <form id="roleForm" class="vstack gap-2">
+                <input class="form-control" id="userUid" placeholder="User UID">
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-primary" data-role="moderator" data-value="true" type="button">Přidat moderator</button>
+                  <button class="btn btn-outline-secondary" data-role="moderator" data-value="false" type="button">Odebrat moderator</button>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-danger" data-role="admin" data-value="true" type="button">Přidat admin</button>
+                  <button class="btn btn-outline-dark" data-role="admin" data-value="false" type="button">Odebrat admin</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="tab-pane fade" id="users" role="tabpanel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 m-0">Uživatelé</h2>
+        <div class="d-flex gap-2">
+          <input class="form-control form-control-sm" style="width:280px" id="userSearch" placeholder="Hledat e-mail/jméno">
+          <button class="btn btn-sm btn-outline-primary" id="reloadUsers">Reload</button>
+        </div>
+      </div>
+      <div class="d-flex gap-2 align-items-center mt-2"><label class="small text-muted">Řadit podle:</label><select class="form-select form-select-sm" style="width:180px" id="userField"><option value="email">email</option><option value="displayName">displayName</option></select></div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Email</th><th>Display</th><th>UID</th><th>Claims</th><th>Akce</th></tr></thead>
+          <tbody id="usersBody"></tbody>
+<tfoot><tr><td colspan="4"><div id="usersSentinel" class="py-3 text-center text-muted">Načítám…</div></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="d-flex justify-content-end"><button class="btn btn-outline-secondary" id="moreUsers">Načíst další</button></div>
+    </div>
+
+
+    <div class="tab-pane fade" id="logs" role="tabpanel">
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-3"><input class="form-control" id="logListingId" placeholder="listingId"></div>
+        <div class="col-md-3"><input class="form-control" id="logActorUid" placeholder="actorUid"></div>
+        <div class="col-md-3"><input class="form-control" id="logFrom" type="datetime-local"></div>
+        <div class="col-md-3"><input class="form-control" id="logTo" type="datetime-local"></div>
+        <div class="col-12 d-flex gap-2"><button class="btn btn-sm btn-outline-primary" id="loadLogs">Načíst</button><button class="btn btn-sm btn-outline-success" id="exportLogs">Export CSV</button><button class="btn btn-sm btn-outline-secondary" id="clearLogs">Vymazat filtry</button></div>
+      </div>
+      <div class="table-responsive" style="max-height:420px; overflow:auto">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Čas</th><th>listingId</th><th>action</th><th>actorUid</th><th>note</th></tr></thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+</div>
+</main>
+<script type="module">
+function debounce(fn, t=250){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a), t); }; }
+import { auth, db, onAuthStateChanged, collection, query, where, orderBy, getDocs, updateDoc, doc, functions, httpsCallable } from '/assets/js/firebase.js';
+
+let currentUser=null; onAuthStateChanged(auth,(u)=>{ currentUser=u; if(!u) window.location.href='/login.html?lang=cs'; else loadQueue(); });
+
+async function loadQueue(){
+  const qy = query(collection(db,'listings'), where('status','==','pending'), orderBy('createdAt','asc'));
+  const snap = await getDocs(qy);
+  const items = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  document.getElementById('queue').innerHTML = items.map(item=>`
+    <div class='col-md-6'>
+      <div class='card h-100'>
+        <img src='${(item.images||[])[0]||""}' class='card-img-top' alt='${item.title}'>
+        <div class='card-body'>
+          <div class='d-flex justify-content-between align-items-start'>
+            <div>
+              <h5 class='card-title m-0'>${item.title}</h5>
+              <div class='text-muted small'>${item.city} • ${item.deal} • ${item.type} • €${item.price}</div>
+            </div>
+            <span class='badge text-bg-warning'>pending</span>
+          </div>
+          <div class='d-flex gap-2 mt-3 justify-content-end'>
+            <button class='btn btn-sm btn-outline-danger' data-action='reject' data-id='${item.id}'>Zamítnout</button>
+            <button class='btn btn-sm btn-primary' data-action='approve' data-id='${item.id}'>Schválit</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('') || '<div class="text-muted">Žádné čekající položky.</div>';
+}
+
+document.getElementById('queue').addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button[data-action]'); if(!btn) return;
+  const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action');
+  const st = (action==='approve')?'active':'rejected';
+  await updateDoc(doc(db,'listings', id), { status: st });
+  await loadQueue();
+});
+
+// Roles
+const form = document.getElementById('roleForm');
+form?.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button[data-role]'); if(!btn) return;
+  const uid = document.getElementById('userUid').value.trim(); if(!uid) return alert('Zadejte UID');
+  const role = btn.getAttribute('data-role'); const value = btn.getAttribute('data-value')==='true';
+  const setUserRole = httpsCallable(functions, 'setUserRole');
+  try{ await setUserRole({ uid, role, value }); alert('Hotovo'); }
+  catch(err){ alert('Chyba: '+(err.message||'unknown')); }
+});
+
+// Enhance moderation UI with selection & detail
+const queueEl = document.getElementById('queue');
+const detail = document.getElementById('detailContent');
+const modNote = document.getElementById('modNote');
+let selected = new Set();
+
+function itemCard(item){
+  const img = (item.images||[])[0]||'';
+  return `
+  <div class="col-md-6">
+    <div class="card h-100" data-id="${item.id}">
+      <div class="position-absolute p-2">
+        <input type="checkbox" class="form-check-input selectCb" data-id="${item.id}">
+      </div>
+      <img src="${img}" class="card-img-top" alt="${item.title}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="card-title m-0">${item.title}</h5>
+            <div class="text-muted small">${item.city} • ${item.deal} • ${item.type} • €${item.price}</div>
+          </div>
+          <span class="badge text-bg-warning">pending</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function loadQueue(){
+  const { getDocs, query, collection, where, orderBy } = await import('/assets/js/firebase.js');
+  const qy = query(collection(db,'listings'), where('status','==','pending'), orderBy('createdAt','asc'));
+  const snap = await getDocs(qy);
+  const items = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  queueEl.innerHTML = items.map(itemCard).join('') || '<div class="text-muted">Žádné čekající položky.</div>';
+}
+
+queueEl?.addEventListener('click', async (e)=>{
+  const card = e.target.closest('.card[data-id]');
+  const cb = e.target.closest('.selectCb');
+  if(cb){
+    const id = cb.getAttribute('data-id');
+    cb.checked ? selected.add(id) : selected.delete(id);
+    return;
+  }
+  if(!card) return;
+  const id = card.getAttribute('data-id');
+  const { getDoc, doc } = await import('/assets/js/firebase.js');
+  const ds = await getDoc(doc(db,'listings', id));
+  const it = {id:ds.id, ...ds.data()};
+  const imgs = (it.images||[]).map(u=>`<div class='col-6 mb-2'><img class='img-fluid rounded' src='${u}'></div>`).join('');
+  detail.innerHTML = `
+    <div class='mb-2'><strong>${it.title}</strong></div>
+    <div class='text-muted small mb-2'>${it.city} • ${it.deal} • ${it.type} • €${it.price}</div>
+    <div class='row'>${imgs}</div>
+    <div class='mt-2'>${it.description||''}</div>
+    <div class='mt-2 text-muted small'>ID: ${it.id} • Owner: ${it.ownerUid||'-'}</div>
+  `;
+});
+
+async function bulkSetStatus(status){
+  if(selected.size===0){ alert('Vyberte položky'); return; }
+  const { writeBatch, doc, serverTimestamp } = await import('/assets/js/firebase.js');
+  const batch = writeBatch(db);
+  const note = (modNote?.value||'').slice(0,500);
+  const ids = Array.from(selected);
+  ids.forEach(id=>{
+    batch.update(doc(db,'listings', id), { status });
+    if(note){
+      const logRef = doc(collection(db,'moderationLogs'));
+      batch.set(logRef, { listingId:id, action: status, note, actorUid: currentUser.uid, at: serverTimestamp() });
+    }
+  });
+  await batch.commit();
+  selected.clear(); await loadQueue();
+}
+
+document.getElementById('approveSelected')?.addEventListener('click', ()=>bulkSetStatus('active'));
+document.getElementById('rejectSelected')?.addEventListener('click', ()=>bulkSetStatus('rejected'));
+
+// Users tab
+const usersBody = document.getElementById('usersBody');
+let nextPageToken = null;
+async function loadUsers(reset=false){
+  if(reset){ usersBody.innerHTML=''; window.__USR_CURSOR__=null; }
+  const callable = httpsCallable(functions, 'searchUsersDirectory');
+  const res = await callable({ startAfter: window.__USR_CURSOR__||null, query: userQuery, limit: 50 });
+  const { users, nextCursor } = res.data; window.__USR_CURSOR__ = nextCursor || null;
+  const qlc = (q||'').toLowerCase();
+  const sorted = [...users].sort((a,b)=>{ const an=(a.displayName_lower||''); const bn=(b.displayName_lower||''); const ae=(a.email_lower||''); const be=(b.email_lower||''); return an.localeCompare(bn)||ae.localeCompare(be)||(a.uid||'').localeCompare(b.uid||''); });
+  usersBody.insertAdjacentHTML('beforeend', sorted.map(u=>`<tr>
+    <td>${window.__hl__.highlightMatch(u.email||'', q)}</td>
+    <td>${window.__hl__.highlightMatch(u.displayName||'', q)}</td>
+    <td class='small'>${u.uid}</td>
+    <td class='small'>${JSON.stringify(u.claims||{})}</td>
+    <td>
+      <div class='btn-group btn-group-sm'>
+        <button class='btn btn-outline-primary set-role' data-uid='${u.uid}' data-role='moderator' data-value='true'>+Mod</button>
+        <button class='btn btn-outline-secondary set-role' data-uid='${u.uid}' data-role='moderator' data-value='false'>-Mod</button>
+        <button class='btn btn-outline-danger set-role' data-uid='${u.uid}' data-role='admin' data-value='true'>+Admin</button>
+        <button class='btn btn-outline-dark set-role' data-uid='${u.uid}' data-role='admin' data-value='false'>-Admin</button>
+      </div>
+    </td>
+  </tr>`).join(''));
+}
+
+document.getElementById('reloadUsers')?.addEventListener('click', ()=>loadUsers(true));
+document.getElementById('moreUsers')?.addEventListener('click', ()=>loadUsers(false));
+
+document.getElementById('usersBody')?.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('.set-role'); if(!btn) return;
+  const uid = btn.getAttribute('data-uid');
+  const role = btn.getAttribute('data-role');
+  const value = btn.getAttribute('data-value')==='true';
+  const setUserRole = httpsCallable(functions, 'setUserRole');
+  await setUserRole({ uid, role, value });
+  alert('OK');
+});
+
+// Init
+loadQueue();
+document.getElementById('reloadUsers') && loadUsers(true);
+
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+function debounce(fn, t=250){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a), t); }; }
+import { httpsCallable, functions, db, collection, query, orderBy, getDocs, limit } from '/assets/js/firebase.js';
+
+// Users search & paging
+const usersBody = document.getElementById('usersBody');
+const userSearch = document.getElementById('userSearch');
+let nextPageToken = null; let userQuery='';
+async function loadUsers(reset=false){
+  if(reset){ usersBody.innerHTML=''; window.__USR_CURSOR__=null; userQuery = (userSearch?.value||'').trim(); }
+  const callable = httpsCallable(functions, 'searchUsersDirectory');
+  const res = await callable({ startAfter: window.__USR_CURSOR__||null, query: userQuery, limit: 50 });
+  const { users, nextCursor } = res.data; window.__USR_CURSOR__ = nextCursor || null;
+  const qlc = (q||'').toLowerCase();
+  const sorted = [...users].sort((a,b)=>{ const an=(a.displayName_lower||''); const bn=(b.displayName_lower||''); const ae=(a.email_lower||''); const be=(b.email_lower||''); return an.localeCompare(bn)||ae.localeCompare(be)||(a.uid||'').localeCompare(b.uid||''); });
+  usersBody.insertAdjacentHTML('beforeend', sorted.map(u=>`<tr>
+    <td>${window.__hl__.highlightMatch(u.email||'', q)}</td>
+    <td>${window.__hl__.highlightMatch(u.displayName||'', q)}</td>
+    <td class='small'>${u.uid}</td>
+    <td class='small'>${JSON.stringify(u.claims||{})}</td>
+    <td>
+      <div class='btn-group btn-group-sm'>
+        <button class='btn btn-outline-primary set-role' data-uid='${u.uid}' data-role='moderator' data-value='true'>+Mod</button>
+        <button class='btn btn-outline-secondary set-role' data-uid='${u.uid}' data-role='moderator' data-value='false'>-Mod</button>
+        <button class='btn btn-outline-danger set-role' data-uid='${u.uid}' data-role='admin' data-value='true'>+Admin</button>
+        <button class='btn btn-outline-dark set-role' data-uid='${u.uid}' data-role='admin' data-value='false'>-Admin</button>
+      </div>
+    </td>
+  </tr>`).join(''));
+}
+document.getElementById('reloadUsers')?.addEventListener('click', ()=>loadUsers(true));
+document.getElementById('moreUsers')?.addEventListener('click', ()=>loadUsers(false));
+userSearch?.addEventListener('input', debounce(()=>loadUsers(true),250));
+
+// Logs
+const logsBody = document.getElementById('logsBody');
+async function loadLogs(){
+  logsBody.innerHTML = '<tr><td colspan="5" class="text-muted">Načítám…</td></tr>';
+  const snap = await getDocs(query(collection(db,'moderationLogs'), orderBy('at','desc'), limit(200)));
+  const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  const listingId = document.getElementById('logListingId').value.trim();
+  const actorUid = document.getElementById('logActorUid').value.trim();
+  const fromVal = document.getElementById('logFrom').value; const toVal = document.getElementById('logTo').value;
+  const fromTs = fromVal ? new Date(fromVal).getTime() : null;
+  const toTs = toVal ? new Date(toVal).getTime() : null;
+  const filtered = rows.filter(r=>{
+    const t = (r.at && r.at.toDate) ? r.at.toDate().getTime() : (r.at||0);
+    if(fromTs && t < fromTs) return false;
+    if(toTs && t > toTs) return false;
+    if(listingId && r.listingId !== listingId) return false;
+    if(actorUid && r.actorUid !== actorUid) return false;
+    return true;
+  });
+  logsBody.innerHTML = filtered.map(r=>`<tr><td>${r.at && r.at.toDate ? r.at.toDate().toLocaleString() : ''}</td><td>${r.listingId||''}</td><td>${r.action||''}</td><td class='small'>${r.actorUid||''}</td><td class='small'>${(r.note||'').replace(/</g,'&lt;')}</td></tr>`).join('') || '<tr><td colspan="5" class="text-muted">Žádné záznamy</td></tr>';
+}
+document.getElementById('loadLogs')?.addEventListener('click', loadLogs);
+document.getElementById('clearLogs')?.addEventListener('click', ()=>{ document.getElementById('logListingId').value=''; document.getElementById('logActorUid').value=''; document.getElementById('logFrom').value=''; document.getElementById('logTo').value=''; loadLogs(); });
+</script>
+
+
+<script type="module">
+function debounce(fn, t=250){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a), t); }; }
+import { httpsCallable, functions, db, collection, query, orderBy, getDocs, limit } from '/assets/js/firebase.js';
+
+// Users search & paging + inline role buttons
+const usersBody = document.getElementById('usersBody');
+const userSearch = document.getElementById('userSearch');
+let nextPageToken = null; let userQuery='';
+async function loadUsers(reset=false){
+  if(reset){ usersBody.innerHTML=''; window.__USR_CURSOR__=null; userQuery = (userSearch?.value||'').trim(); }
+  const callable = httpsCallable(functions, 'searchUsersDirectory');
+  const res = await callable({ startAfter: window.__USR_CURSOR__||null, query: userQuery, limit: 50 });
+  const { users, nextCursor } = res.data; window.__USR_CURSOR__ = nextCursor || null;
+  const qlc = (q||'').toLowerCase();
+  const sorted = [...users].sort((a,b)=>{ const an=(a.displayName_lower||''); const bn=(b.displayName_lower||''); const ae=(a.email_lower||''); const be=(b.email_lower||''); return an.localeCompare(bn)||ae.localeCompare(be)||(a.uid||'').localeCompare(b.uid||''); });
+  usersBody.insertAdjacentHTML('beforeend', sorted.map(u=>`<tr>
+    <td>${window.__hl__.highlightMatch(u.email||'', q)}</td>
+    <td>${window.__hl__.highlightMatch(u.displayName||'', q)}</td>
+    <td class='small'>${u.uid}</td>
+    <td class='small'>${JSON.stringify(u.claims||{})}</td>
+    <td>
+      <div class='btn-group btn-group-sm'>
+        <button class='btn btn-outline-primary set-role' data-uid='${u.uid}' data-role='moderator' data-value='true'>+Mod</button>
+        <button class='btn btn-outline-secondary set-role' data-uid='${u.uid}' data-role='moderator' data-value='false'>-Mod</button>
+        <button class='btn btn-outline-danger set-role' data-uid='${u.uid}' data-role='admin' data-value='true'>+Admin</button>
+        <button class='btn btn-outline-dark set-role' data-uid='${u.uid}' data-role='admin' data-value='false'>-Admin</button>
+      </div>
+    </td>
+  </tr>`).join(''));
+}
+
+document.getElementById('reloadUsers')?.addEventListener('click', ()=>loadUsers(true));
+document.getElementById('moreUsers')?.addEventListener('click', ()=>loadUsers(false));
+userSearch?.addEventListener('input', debounce(()=>loadUsers(true),250));
+
+document.getElementById('usersBody')?.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('.set-role'); if(!btn) return;
+  const uid = btn.getAttribute('data-uid');
+  const role = btn.getAttribute('data-role');
+  const value = btn.getAttribute('data-value')==='true';
+  const setUserRole = httpsCallable(functions, 'setUserRole');
+  try{ await setUserRole({ uid, role, value }); alert('OK'); }catch(err){ alert('Error: '+(err.message||'unknown')); }
+});
+
+// Logs load + Export CSV
+const logsBody = document.getElementById('logsBody');
+async function loadLogs(){
+  logsBody.innerHTML = '<tr><td colspan="5" class="text-muted">Načítám…</td></tr>';
+  const snap = await getDocs(query(collection(db,'moderationLogs'), orderBy('at','desc'), limit(200)));
+  const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  const listingId = document.getElementById('logListingId').value.trim();
+  const actorUid = document.getElementById('logActorUid').value.trim();
+  const fromVal = document.getElementById('logFrom').value; const toVal = document.getElementById('logTo').value;
+  const fromTs = fromVal ? new Date(fromVal).getTime() : null;
+  const toTs = toVal ? new Date(toVal).getTime() : null;
+  const filtered = rows.filter(r=>{
+    const t = (r.at && r.at.toDate) ? r.at.toDate().getTime() : (r.at||0);
+    if(fromTs && t < fromTs) return false;
+    if(toTs && t > toTs) return false;
+    if(listingId && r.listingId !== listingId) return false;
+    if(actorUid && r.actorUid !== actorUid) return false;
+    return true;
+  });
+  logsBody.innerHTML = filtered.map(r=>`<tr><td>${r.at && r.at.toDate ? r.at.toDate().toLocaleString() : ''}</td><td>${r.listingId||''}</td><td>${r.action||''}</td><td class='small'>${r.actorUid||''}</td><td class='small'>${(r.note||'').replace(/</g,'&lt;')}</td></tr>`).join('') || '<tr><td colspan="5" class="text-muted">Žádné záznamy</td></tr>';
+  window.__LOGS_LAST__ = filtered; // store for export
+}
+
+document.getElementById('loadLogs')?.addEventListener('click', loadLogs);
+document.getElementById('clearLogs')?.addEventListener('click', ()=>{ document.getElementById('logListingId').value=''; document.getElementById('logActorUid').value=''; document.getElementById('logFrom').value=''; document.getElementById('logTo').value=''; loadLogs(); });
+
+document.getElementById('exportLogs')?.addEventListener('click', ()=>{
+  const rows = window.__LOGS_LAST__ || [];
+  const header = ['time','listingId','action','actorUid','note'];
+  const csv = [header.join(',')].concat(rows.map(r=>{
+    const t = r.at && r.at.toDate ? r.at.toDate().toISOString() : '';
+    const cells = [t, r.listingId||'', r.action||'', r.actorUid||'', (r.note||'').replace(/
+/g,' ').replace(/"/g,'""')];
+    return cells.map(c=>`"${String(c)}"`).join(',');
+  })).join('
+');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='moderation_logs.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+// Init
+loadUsers(true);
+</script>
+
+
+<script type="module">
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',''':'&#39;'}[c]));}
+function highlightMatch(str, q){ if(!q) return escapeHtml(str||''); const re = new RegExp(q.replace(/[.*+?^${}()|[\]\]/g,'\$&'),'ig'); return escapeHtml(str||'').replace(re, m=>`<span class="hl">${m}</span>`); }
+window.__hl__ = { highlightMatch };
+</script>
+
+</body>
+</html>
+
+<script type="module">
+function debounce(fn, t=250){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a), t); }; }
+import { httpsCallable, functions } from '/assets/js/firebase.js';
+const logsBody = document.getElementById('logsBody');
+let logsCursor = null;
+async function loadLogs(reset=false){
+  if(reset){ logsBody.innerHTML='<tr><td colspan="5" class="text-muted">Načítám…</td></tr>'; logsCursor=null; }
+  const listingId = document.getElementById('logListingId').value.trim();
+  const actorUid = document.getElementById('logActorUid').value.trim();
+  const fromVal = document.getElementById('logFrom').value; const toVal = document.getElementById('logTo').value;
+  const fromMs = fromVal? new Date(fromVal).getTime(): null; const toMs = toVal? new Date(toVal).getTime(): null;
+  const callable = httpsCallable(functions, 'listModerationLogs');
+  const res = await callable({ listingId, actorUid, from: fromMs, to: toMs, startAfter: logsCursor, limit: 100 });
+  const { rows, nextCursor } = res.data; logsCursor = nextCursor || null;
+  const htmlRows = rows.map(r=>`<tr><td>${r.atMs? new Date(r.atMs).toLocaleString():''}</td><td>${r.listingId||''}</td><td>${r.action||''}</td><td class='small'>${r.actorUid||''}</td><td class='small'>${(r.note||'').replace(/</g,'&lt;')}</td></tr>`).join('');
+  if(reset) logsBody.innerHTML = htmlRows || '<tr><td colspan="5" class="text-muted">Žádné záznamy</td></tr>'; else logsBody.insertAdjacentHTML('beforeend', htmlRows);
+}
+window.loadLogs = loadLogs;
+</script>

@@ -1,0 +1,132 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Listings · bezrealit.eu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="/assets/img/logo.svg" alt="" class="me-2" height="28"><strong>bezrealit.eu</strong>
+    </a>
+  </div>
+</nav>
+<main class="container py-4" id="dashboard">
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">Nový inzerát</div>
+        <div class="card-body">
+          <form id="newForm" class="vstack gap-2">
+            <input class="form-control" name="title" placeholder="Název">
+            <div class="row g-2">
+              <div class="col-6">
+                <select class="form-select" name="deal"><option>Rent</option><option>Sale</option></select>
+              </div>
+              <div class="col-6">
+                <select class="form-select" name="type"><option>Apartment</option><option>House</option><option>Land</option><option>Room</option></select>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-6"><input class="form-control" name="price" placeholder="Cena" type="number"></div>
+              <div class="col-6"><input class="form-control" name="city" placeholder="Město"></div>
+            </div>
+            <input class="form-control" name="address" placeholder="Adresa">
+            <div class="row g-2">
+              <div class="col-6"><input class="form-control" name="beds" placeholder="Pokoje" type="number"></div>
+              <div class="col-6"><input class="form-control" name="area" placeholder="Plocha m²" type="number"></div>
+            </div>
+            <textarea class="form-control" name="description" rows="3" placeholder="Popis"></textarea>
+            <label class="uploader w-100">
+              <input type="file" id="photos" multiple accept="image/*">
+              <div><i class="bi bi-upload"></i> Nahrajte fotky</div>
+            </label>
+            <div class="row mt-2" id="previewGrid"></div>
+            <div class="d-grid"><button class="btn btn-primary" type="submit">Publikovat</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h1 class="h4 m-0">Moje inzeráty</h1>
+      </div>
+      <div id="myGrid" class="row g-3"></div>
+    </div>
+  </div>
+</main>
+<script type="module">
+import { auth, onAuthStateChanged } from '/assets/js/firebase.js';
+import { createListing, getMyListings, updateListing, removeListing, uploadPhotos } from '/assets/js/modules/listings.js';
+import { compressImage, previewFiles } from '/assets/js/modules/image.js';
+
+function card(item){
+  return `
+  <div class="col-md-6">
+    <div class="card h-100">
+      <img src="${(item.images||[])[0]||''}" class="card-img-top" alt="${item.title}">
+      <div class="card-body">
+        <h5 class="card-title">${item.title}</h5>
+        <div class="text-muted small">${item.city} • ${item.deal} • ${item.type}</div>
+        <div class="mt-2">€${item.price}</div>
+        <div class="d-flex gap-2 mt-3">
+          <a class="btn btn-sm btn-outline-primary" href="/property.html?id=${item.id}">Zobrazit</a>
+          <button class="btn btn-sm btn-outline-secondary" data-action="pause" data-id="${item.id}">Pozastavit</button>
+          <button class="btn btn-sm btn-outline-danger" data-action="remove" data-id="${item.id}">Smazat</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const form = document.getElementById('newForm');
+const grid = document.getElementById('myGrid');
+const previewGrid = document.getElementById('previewGrid');
+const photosInput = document.getElementById('photos');
+photosInput?.addEventListener('change', ()=>{ if(photosInput.files?.length) previewFiles(photosInput.files, previewGrid); });
+let currentUser = null;
+
+onAuthStateChanged(auth, async (u)=>{
+  if(!u){ window.location.href = '/login.html?lang=cs'; return; }
+  currentUser = u;
+  const items = await getMyListings(u.uid);
+  grid.innerHTML = items.map(card).join('') || '<div class="text-muted">Zatím žádné inzeráty.</div>';
+});
+
+form?.addEventListener('submit', async (e)=>{
+  e.preventDefault(); if(!currentUser) return; 
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+  data.price = parseInt(data.price||'0',10);
+  data.beds = parseInt(data.beds||'0',10);
+  data.area = parseInt(data.area||'0',10);
+  // photos
+  const files = document.getElementById('photos').files;
+  if(files && files.length){
+    const compressed = [];
+    for (const f of files){ compressed.push(await compressImage(f, {maxW:1600, maxH:1200, quality:0.85})); }
+    data.images = await uploadPhotos(currentUser.uid, compressed, (p)=>{});
+  }
+  const id = await createListing(currentUser.uid, data);
+  window.location.href = '/property.html?id='+id;
+});
+
+grid?.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button[data-action]');
+  if(!btn) return;
+  const id = btn.getAttribute('data-id');
+  const action = btn.getAttribute('data-action');
+  if(action==='pause') await updateListing(id, { status:'paused' });
+  if(action==='remove' && confirm('Opravdu smazat?')) await removeListing(id);
+  location.reload();
+});
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
